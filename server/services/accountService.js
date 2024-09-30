@@ -1,6 +1,5 @@
 const Account = require("../database/models/accountModel");
 const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken");
 module.exports.postAccount = async (req, res) => {
   try {
     if (!req.body || !Array.isArray(req.body) || req.body.length === 0) {
@@ -62,7 +61,7 @@ exports.getAccount = async (req) => {
 
   return account;
 };
-module.exports.getAllAccounts = async () => {
+exports.getAllAccounts = async () => {
   try {
     const accounts = await Account.find({});
     return accounts;

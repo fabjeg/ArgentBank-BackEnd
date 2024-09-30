@@ -26,7 +26,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // Handle custom routes
 app.use("/api/v1/user", require("./routes/userRoutes"));
-// app.use("/api/v1", accountRoutes);
 app.use("/api/v1/accounts", accountRoutes);
 
 // API Documentation

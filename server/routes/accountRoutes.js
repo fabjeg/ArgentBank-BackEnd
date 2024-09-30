@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const accountController = require("../services/accountService");
+const tokenValidation = require("../middleware/tokenValidation");
 
 router.post("/api/v1/accounts", accountController.postAccount);
 router.get("/", async (req, res) => {
@@ -13,5 +14,4 @@ router.get("/", async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 });
-
 module.exports = router;
