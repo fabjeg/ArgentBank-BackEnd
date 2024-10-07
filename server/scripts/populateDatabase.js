@@ -24,7 +24,7 @@ const users = [
 //     .then((response) => console.log(response))
 //     .catch((error) => console.log(error));
 // });
-const accountAPI = "http://localhost:3001/api/v1/accounts";
+const accountAPI = "http://localhost:3001/api/v1/accounts/api/v1/accounts";
 const accounts = [
   {
     account1: {
@@ -190,7 +190,7 @@ const accounts = [
 ];
 
 axios
-  .post(accountAPI, accounts, {
+  .post(accountAPI, accounts[0], {
     headers: {
       "Content-Type": "application/json;charset=utf-8",
     },

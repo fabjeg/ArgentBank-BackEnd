@@ -1,48 +1,8 @@
 const Account = require("../database/models/accountModel");
 const mongoose = require("mongoose");
-module.exports.postAccount = async (req, res) => {
-  try {
-    if (!req.body || !Array.isArray(req.body) || req.body.length === 0) {
-      return res.status(400).json({ error: "Aucune donnée fournie" });
-    }
-
-    const newAccounts = await Promise.all(
-      req.body.map(async (serviceData) => {
-        const accountExists = await Account.findOne({
-          $or: [
-            {
-              "account1.accountDetails.accountNumber":
-                serviceData.account1.accountDetails.accountNumber,
-            },
-            {
-              "account2.accountDetails.accountNumber":
-                serviceData.account2.accountDetails.accountNumber,
-            },
-            {
-              "account3.accountDetails.accountNumber":
-                serviceData.account3.accountDetails.accountNumber,
-            },
-          ],
-        });
-
-        if (accountExists) {
-          throw new Error("Le compte existe déjà");
-        }
-
-        const newAccount = new Account(serviceData);
-        return await newAccount.save();
-      })
-    );
-
-    return res.status(201).json(newAccounts);
-  } catch (error) {
-    console.error("Erreur dans accountService.js :", error.message);
-    return res.status(500).json({ error: error.message });
-  }
-};
+const jwt = require("jsonwebtoken");
 
 exports.getAccount = async (req) => {
-  console.log("Tentative de récupération des comptes...");
   const jwtToken = req.headers.authorization.split(" ")[1];
   const decodedToken = jwt.decode(jwtToken);
   const userId = decodedToken.id;
@@ -52,13 +12,11 @@ exports.getAccount = async (req) => {
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     throw new Error("Invalid user ID");
   }
-
   const account = await Account.findOne({ accountID: userId });
-
+  console.log("Envoi des données du compte :", account);
   if (!account) {
     throw new Error("Account not found!");
   }
-
   return account;
 };
 exports.getAllAccounts = async () => {
@@ -67,5 +25,51 @@ exports.getAllAccounts = async () => {
     return accounts;
   } catch (error) {
     throw error;
+  }
+};
+module.exports.createAccount = async (accountData) => {
+  try {
+    const accounts = Array.isArray(accountData) ? accountData : [accountData];
+
+    const results = await Promise.all(
+      accounts.map(async (data) => {
+        const newAccount = new Account(data);
+        return await newAccount.save();
+      })
+    );
+
+    return results;
+  } catch (error) {
+    console.error("Error in accountService.js", error);
+    throw new Error(error);
+  }
+};
+
+module.exports.updateAccountNote = async (req) => {
+  try {
+    console.log("transaction_id:", req.body.transaction_id);
+    console.log("transactionNote:", req.body.transactionNote);
+
+    const updatedAccount = await Account.findOneAndUpdate(
+      {
+        "account1.transactions._id": req.body.transaction_id,
+      },
+      {
+        $set: {
+          "account1.transactions.$.transactionNote": req.body.transactionNote,
+        },
+      },
+      { new: true }
+    );
+
+    if (!updatedAccount) {
+      throw new Error("Compte ou transaction non trouvé !");
+    }
+    return updatedAccount;
+  } catch (error) {
+    throw new Error(
+      error.message ||
+        "Erreur lors de la mise à jour de la note de transaction."
+    );
   }
 };

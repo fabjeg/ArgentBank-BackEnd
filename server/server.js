@@ -27,6 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 // Handle custom routes
 app.use("/api/v1/user", require("./routes/userRoutes"));
 app.use("/api/v1/accounts", accountRoutes);
+app.put("/api/v1/transactions/update-note", accountRoutes);
 
 // API Documentation
 if (process.env.NODE_ENV !== "production") {
@@ -41,3 +42,6 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
 });
+
+const morgan = require("morgan");
+app.use(morgan("dev"));

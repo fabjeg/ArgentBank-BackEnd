@@ -1,39 +1,6 @@
 const Account = require("../database/models/accountModel");
-
-module.exports.postAccount = async (req, res) => {
-  console.log("Données reçues :", req.body);
-  const accounts = req.body[0];
-  const { account1, account2, account3 } = accounts;
-  if (
-    !account1 ||
-    !account1.accountDetails ||
-    !account1.accountDetails.accountNumber ||
-    !account2 ||
-    !account2.accountDetails ||
-    !account2.accountDetails.accountNumber ||
-    !account3 ||
-    !account3.accountDetails ||
-    !account3.accountDetails.accountNumber
-  ) {
-    return res
-      .status(400)
-      .json({ error: "Aucune donnée fournie ou données invalides" });
-  }
-  try {
-    const newAccount = new Account({
-      account1,
-      account2,
-      account3,
-    });
-    await newAccount.save();
-    return res
-      .status(201)
-      .json({ message: "Account created successfully", account: newAccount });
-  } catch (error) {
-    console.error("Erreur dans accountService.js :", error.message);
-    return res.status(500).json({ error: error.message });
-  }
-};
+const accountService = require("../services/accountService");
+const transactions = require("../database/models/accountModel");
 
 exports.getAccount = async (userId) => {
   console.log("Vérification de l'ID utilisateur :", userId); // Ajoutez ce log
@@ -45,4 +12,40 @@ exports.getAccount = async (userId) => {
     throw new Error("Account not found!");
   }
   return account;
+};
+
+module.exports.createAccount = async (req, res) => {
+  let response = {};
+
+  try {
+    const responseFromService = await accountService.createAccount(req.body);
+    response.status = 200;
+    response.message = "Account successfully created";
+    response.body = responseFromService;
+  } catch (error) {
+    console.error("Something went wrong in accountController.js", error);
+    response.status = 400;
+    response.message = error.message;
+  }
+
+  return res.status(response.status).send(response);
+};
+
+module.exports.updateAccountNote = async (req, res) => {
+  let response = {};
+
+  try {
+    const updatedAccount = await accountService.updateAccountNote(req);
+    response.status = 200;
+    response.message = "Note de transaction mise à jour avec succès !";
+    response.body = updatedAccount;
+  } catch (error) {
+    console.log("Erreur dans updateAccountNote - accountController.js:", error);
+    response.status = 400;
+    response.message =
+      error.message ||
+      "Erreur lors de la mise à jour de la note de transaction.";
+  }
+
+  return res.status(response.status).json(response);
 };

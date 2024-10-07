@@ -67,6 +67,8 @@ paths:
         - User Module
       summary: User Profile API
       description: API for fetching a user profile
+      produces:
+        - application/json
       responses:
         "200":
           description: User profile retrieved successfully
@@ -114,50 +116,7 @@ paths:
           description: Account Payload
           required: true
           schema:
-            type: object
-            properties:
-              account1:
-                type: object
-                properties:
-                  accountDetails:
-                    type: object
-                    properties:
-                      accountNumber:
-                        type: string
-                      accountBalance:
-                        type: number
-                  transactions:
-                    type: array
-                    items:
-                      $ref: "#/definitions/Transaction"
-              account2:
-                type: object
-                properties:
-                  accountDetails:
-                    type: object
-                    properties:
-                      accountNumber:
-                        type: string
-                      accountBalance:
-                        type: number
-                  transactions:
-                    type: array
-                    items:
-                      $ref: "#/definitions/Transaction"
-              account3:
-                type: object
-                properties:
-                  accountDetails:
-                    type: object
-                    properties:
-                      accountNumber:
-                        type: string
-                      accountBalance:
-                        type: number
-                  transactions:
-                    type: array
-                    items:
-                      $ref: "#/definitions/Transaction"
+            $ref: "#/definitions/AccountPayload"
       produces:
         - application/json
       responses:
@@ -193,14 +152,7 @@ paths:
               accounts:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    account1:
-                      type: object
-                    account2:
-                      type: object
-                    account3:
-                      type: object
+                  $ref: "#/definitions/AccountDetails"
         "404":
           description: No accounts found
         "500":
@@ -220,7 +172,14 @@ paths:
           description: Update transaction note attributes
           required: true
           schema:
-            $ref: "#/definitions/TransactionUpdateRequest"
+            type: object
+            properties:
+              transaction_id:
+                type: string
+                description: The ID of the transaction
+              transactionNote:
+                type: string
+                description: The new note for the transaction
       produces:
         - application/json
       responses:
@@ -231,7 +190,7 @@ paths:
         "400":
           description: Invalid fields
         "404":
-          description: Transaction or account not found
+          description: Transaction not found
         "500":
           description: Internal server error
 
@@ -243,6 +202,7 @@ securityDefinitions:
 
 definitions:
   User:
+    type: object
     properties:
       email:
         type: string
@@ -261,6 +221,7 @@ definitions:
         description: user public name
 
   Login:
+    type: object
     properties:
       email:
         type: string
@@ -296,6 +257,64 @@ definitions:
       userName:
         type: string
 
+  AccountPayload:
+    type: object
+    properties:
+      account1:
+        type: object
+        properties:
+          accountDetails:
+            type: object
+            properties:
+              accountNumber:
+                type: string
+              accountBalance:
+                type: number
+          transactions:
+            type: array
+            items:
+              $ref: "#/definitions/Transaction"
+      account2:
+        type: object
+        properties:
+          accountDetails:
+            type: object
+            properties:
+              accountNumber:
+                type: string
+              accountBalance:
+                type: number
+          transactions:
+            type: array
+            items:
+              $ref: "#/definitions/Transaction"
+      account3:
+        type: object
+        properties:
+          accountDetails:
+            type: object
+            properties:
+              accountNumber:
+                type: string
+              accountBalance:
+                type: number
+          transactions:
+            type: array
+            items:
+              $ref: "#/definitions/Transaction"
+
+  AccountDetails:
+    type: object
+    properties:
+      accountNumber:
+        type: string
+      accountBalance:
+        type: number
+      transactions:
+        type: array
+        items:
+          $ref: "#/definitions/Transaction"
+
   Transaction:
     type: object
     properties:
@@ -313,10 +332,3 @@ definitions:
         type: string
       transactionNote:
         type: string
-
-  TransactionUpdateRequest:
-    type: object
-    properties:
-      transactionNote:
-        type: string
-        description: The new note for the transaction
