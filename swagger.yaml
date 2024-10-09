@@ -180,6 +180,10 @@ paths:
               transactionNote:
                 type: string
                 description: The new note for the transaction
+              transactionCategory:
+                type: string
+                description: The new category for the transaction
+
       produces:
         - application/json
       responses:

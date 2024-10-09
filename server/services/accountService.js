@@ -57,6 +57,8 @@ module.exports.updateAccountNote = async (req) => {
       {
         $set: {
           "account1.transactions.$.transactionNote": req.body.transactionNote,
+          "account1.transactions.$.transactionCategory":
+            req.body.transactionCategory,
         },
       },
       { new: true }
